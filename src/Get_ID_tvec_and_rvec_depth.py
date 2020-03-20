@@ -104,13 +104,63 @@ def calibrate():
 def myhook():
     print ("shutdown time!")
 
+def realsense_depth():
+    # pipeline = rs.pipeline()
+    # config = rs.config()
+    # config.enable_stream(rs.stream.depth, 640, 480, rs.format.z16, 30)
+    # config.enable_stream(rs.stream.color, 640, 480, rs.format.bgr8, 30)
+    
+    # pipeline.start(config)
+    
+    # try:
+    #     while True:
+    #         frames = pipeline.wait_for_frames()
+    #         depth_frame = frames.get_depth_frame()
+    #         color_frame = frames.get_color_frame()
+    #         if not depth_frame or not color_frame:
+    #             continue
+    
+    #         depth_image = np.asanyarray(depth_frame.get_data())
+    #         color_image = np.asanyarray(color_frame.get_data())
+    
+    #         depth_colormap = cv2.applyColorMap(cv2.convertScaleAbs(depth_image, alpha=0.03), cv2.COLORMAP_WINTER)
+
+    # ################加入這段程式#####################
+
+    #         print("shape of color image:{0}".format(color_image.shape))
+    #         print("shape of depth image:{0}".format(depth_colormap.shape))
+    #         print("depth value in m:{0}".format(depth_frame.get_distance(320, 240)))
+
+
+    #         text_depth = "depth value of point (320,240) is "+str(np.round(depth_frame.get_distance(320, 240),4))+"meter(s)"
+    #         color_image = cv2.circle(color_image,(320,240),1,(0,255,255),-1)
+    #         color_image=cv2.putText(color_image, text_depth, (10,20),  cv2.FONT_HERSHEY_PLAIN, 1, (0,0,255), 1, cv2.LINE_AA)
+
+    # #################################################
+
+    #         images = np.hstack((color_image, depth_colormap))
+            
+    #         cv2.namedWindow('RealSense', cv2.WINDOW_AUTOSIZE)
+    #         cv2.imshow('RealSense', images)
+    
+    
+    #         key = cv2.waitKey(1)
+    #         if key & 0xFF == ord('q') or key == 27:
+    #             cv2.destroyAllWindows()
+    #             break
+    
+    
+    # finally:
+    #     pipeline.stop()
+    print("thread")
+
 if __name__ == '__main__':
     
     argv = rospy.myargv()
     rospy.init_node('ar_ros_server', anonymous=True)
 
-    #t = threading.Thread(target=socket_client)
-    #t.start() # 開啟多執行緒
+    t = threading.Thread(target=realsense_depth)
+    t.start() # 開啟多執行緒
 
 
 #test wheater already calibrated or not
@@ -156,16 +206,6 @@ if __name__ == '__main__':
     parameters = cv2.aruco.DetectorParameters_create()
     parameters.adaptiveThreshConstant = 10
 
-
-# include realsense depth code
-    # pipeline = rs.pipeline()
-    # config = rs.config()
-    # config.enable_stream(rs.stream.depth, 640, 480, rs.format.z16, 30)
-    # config.enable_stream(rs.stream.color, 640, 480, rs.format.bgr8, 30)
-    
-    # pipeline.start(config)
-
-
     while True:
 
         ret, frame = cap.read()
@@ -190,35 +230,14 @@ if __name__ == '__main__':
 
                 #get tvec, rvec of each id
                 # print(ids[i])
-                # print(tvec[i][0])
-                # print(rvec[i][0])
+                print(tvec[i][0])
+                print(rvec[i][0])
             # print(ids)
             # print(tvec)
             # print(rvec)
-# include realsense depth code
-        #         frames = pipeline.wait_for_frames()
-        #         depth_frame = frames.get_depth_frame()
-        #         color_frame = frames.get_color_frame()
-        #         if not depth_frame or not color_frame:
-        #             continue
-        
-        #         depth_image = np.asanyarray(depth_frame.get_data())
-        #         color_image = np.asanyarray(color_frame.get_data())
-        
-        #         depth_colormap = cv2.applyColorMap(cv2.convertScaleAbs(depth_image, alpha=0.03), cv2.COLORMAP_WINTER)
 
-        # #################加入這段程式#####################
-
-        #         #print("shape of color image:{0}".format(color_image.shape))
-        #         #print("shape of depth image:{0}".format(depth_colormap.shape))
-        #         #print("depth value in m:{0}".format(depth_frame.get_distance(320, 240)))
-
-
-        #         text_depth = "depth value of point (320,240) is "+str(np.round(depth_frame.get_distance(320, 240),4))+"meter(s)"
-        #         #color_image = cv2.circle(color_image,(320,240),1,(0,255,255),-1)
-        #         #color_image=cv2.putText(color_image, text_depth, (10,20),  cv2.FONT_HERSHEY_PLAIN, 1, (0,0,255), 1, cv2.LINE_AA)
-# include realsense depth code
             aruco.drawDetectedMarkers(frame, corners)
+
         else:
             tvec = [[[0, 0, 0]]]
             rvec = [[[0, 0, 0]]]
@@ -226,7 +245,7 @@ if __name__ == '__main__':
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
 
-    #t.join()
+    t.join()
     cap.release()
     cv2.destroyAllWindows()
     rospy.on_shutdown(myhook)
