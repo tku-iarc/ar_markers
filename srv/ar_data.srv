@@ -1,5 +1,0 @@
-float64 ack
----
-int32[] id_sent
-float64[] tvec_sent
-float64[] rvec_sent

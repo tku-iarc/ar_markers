@@ -1,6 +1,0 @@
-<launch>
-    
-    <node name="ros_rqt" pkg="rqt_reconfigure" type="rqt_reconfigure"/>
-
-    <node name="ar_ros_server" pkg="ar_markers" type="Get_ID_tvec_and_rvec.py" output="screen"/>
-</launch>
