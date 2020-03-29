@@ -28,7 +28,7 @@ class MarkerPosture():
         self.name = name
         self.cnd = 0
         # Check for camera calibration data
-        if not os.path.exists('/home/iclab/aruco_ws/src/aruco_detection/cfg/calibration.pckl'):
+        if not os.path.exists('/home/iclab/Documents/ar_ws/src/ar_markers/aruco_detection/cfg/calibration.pckl'):
             print("You need to calibrate the camera you'll be using. See calibration project directory for details.")
             self.cameraMatrix = [[603.00869939,   0.0,          318.46049727],
                                  [0.0,            601.50770586, 251.87010006],
@@ -37,7 +37,7 @@ class MarkerPosture():
 
             #exit()
         else:
-            f = open('/home/iclab/aruco_ws/src/aruco_detection/cfg/calibration.pckl', 'rb')
+            f = open('/home/iclab/Documents/ar_ws/src/ar_markers/aruco_detection/cfg/calibration.pckl', 'rb')
             (self.cameraMatrix, self.distCoeffs, _, _) = pickle.load(f)
             f.close()
             if self.cameraMatrix is None or self.distCoeffs is None:
@@ -61,8 +61,8 @@ class MarkerPosture():
         self.rvecs_arr = np.zeros((100, 3, NUMBER))
         self.tvecs_arr = np.zeros((100, 3, NUMBER))
         # cam = cv2.VideoCapture('gridboardiphonetest.mp4')
-        self.cam_left = cv2.VideoCapture(4)
-        self.cam_right = cv2.VideoCapture(10)
+        self.cam_left = cv2.VideoCapture(3)
+        self.cam_right = cv2.VideoCapture(5)
         self.cam = None
         self.QueryImg = None
         self.init_server()
@@ -114,7 +114,7 @@ class MarkerPosture():
                     #    # Draw the camera posture calculated from the gridboard
                     #    self.QueryImg = aruco.drawAxis(self.QueryImg, self.cameraMatrix, self.distCoeffs, rvec, tvec, 0.3)
                     # Estimate the posture per each Aruco marker
-                    self.rvecs, self.tvecs, _ = aruco.estimatePoseSingleMarkers(corners, 0.02, self.cameraMatrix, self.distCoeffs)           
+                    self.rvecs, self.tvecs = aruco.estimatePoseSingleMarkers(corners, 0.02, self.cameraMatrix, self.distCoeffs)
                     for _id, rvec, tvec in zip(ids, self.rvecs, self.tvecs):
                         _id = _id[0]
                         for i in range(3):
@@ -175,12 +175,18 @@ class MarkerPosture():
             if ctn:
                 continue
             # print('[_id, r,t] = ', [_id, r,t])
+            print(_id)
+            print(r_avg)
+            print(t_avg)
             res.ids.append(_id)
             res.rvecs = np.append(res.rvecs, r_avg)
             res.tvecs = np.append(res.tvecs, t_avg)
-            result = np.append(result, [_id, np.copy(r_avg), np.copy(t_avg)])
+            print(res.rvecs)
+            print(res.tvecs)
+            #result = np.append(result, [_id, np.copy(r_avg), np.copy(t_avg)])
+            #print('fuvk')
         
-        result = result.reshape(int(len(result)/3),3)
+        #result = result.reshape(int(len(result)/3),3)
 
         if self.name == 'test':
             for rst in result:
@@ -205,9 +211,9 @@ class MarkerPosture():
         return res
             
 if __name__ == '__main__':
-    rospy.init_node('aruco')
+    rospy.init_node('aruco', anonymous=True)
     is_show = True
-    name = 'test'
+    name = 'testt'
 
     if rospy.has_param('is_show'):
         is_show = rospy.get_param('is_show')

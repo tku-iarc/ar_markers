@@ -14,11 +14,11 @@ import pickle
 import time
 
 # Check for camera calibration data
-if not os.path.exists('./calibration.pckl'):
+if not os.path.exists('/home/iclab/Documents/ar_ws/src/ar_markers/aruco_detection/cfg/calibration.pckl'):
     print("You need to calibrate the camera you'll be using. See calibration project directory for details.")
     exit()
 else:
-    f = open('calibration.pckl', 'rb')
+    f = open('/home/iclab/Documents/ar_ws/src/ar_markers/aruco_detection/cfg/calibration.pckl', 'rb')
     (cameraMatrix, distCoeffs, _, _) = pickle.load(f)
     f.close()
     if cameraMatrix is None or distCoeffs is None:
@@ -41,7 +41,7 @@ board = aruco.GridBoard_create(
 rvecs, tvecs = None, None
 
 # cam = cv2.VideoCapture('gridboardiphonetest.mp4')
-cam = cv2.VideoCapture(4)
+cam = cv2.VideoCapture(5)
 t = 0
 fid = 0
 while(cam.isOpened()):
@@ -80,7 +80,7 @@ while(cam.isOpened()):
             #    # Draw the camera posture calculated from the gridboard
             #    QueryImg = aruco.drawAxis(QueryImg, cameraMatrix, distCoeffs, rvec, tvec, 0.3)
             # Estimate the posture per each Aruco marker
-            rvecs, tvecs, _ = aruco.estimatePoseSingleMarkers(corners, 0.02, cameraMatrix, distCoeffs)           
+            rvecs, tvecs = aruco.estimatePoseSingleMarkers(corners, 0.02, cameraMatrix, distCoeffs)           
             for rvec, tvec in zip(rvecs, tvecs):
                 QueryImg = aruco.drawAxis(QueryImg, cameraMatrix, distCoeffs, rvec, tvec, 0.02)
                 if t == 100:
